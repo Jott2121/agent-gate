@@ -1,3 +1,5 @@
+![agent-gate — gate an AI agent's work before it ships: deterministic checks, refute-first review, tamper-evident receipts](assets/banner.png)
+
 # agent-gate
 
 [![ci](https://github.com/Jott2121/agent-gate/actions/workflows/ci.yml/badge.svg)](https://github.com/Jott2121/agent-gate/actions/workflows/ci.yml)
