@@ -74,7 +74,7 @@ print(led.verify_chain())         # True  (until someone edits the log)
 
 ## Design
 
-- **Tested, dependency-free core.** `agent_gate/gate.py` (fail-closed checklist) and `agent_gate/ledger.py` (hash-chained receipts) are pure stdlib — fast to read, fast to trust. `agent_gate/server.py` is a thin MCP adapter over them.
+- **Tested, stdlib-only core.** `agent_gate/gate.py` (fail-closed checklist) and `agent_gate/ledger.py` (hash-chained receipts) are pure stdlib — fast to read, fast to trust. `agent_gate/server.py` is a thin MCP adapter over them (the one runtime dependency: `mcp`).
 - **17 tests, CI on Python 3.11–3.13.** The MCP tools are tested by *calling them*, not just importing.
 
 ## Tests
@@ -85,4 +85,4 @@ pip install -e ".[dev]" && python -m pytest -q
 
 ## About
 
-Built by **Jeff Otterson** ([Jott2121](https://github.com/Jott2121)). `agent-gate` operationalizes the gating discipline from [**bow**](https://github.com/Jott2121/bow) (an autonomous all-Claude chief-of-staff agent) and the **Fleet Mode** doctrine. MIT licensed.
+Built by **Jeff Otterson** ([Jott2121](https://github.com/Jott2121)). `agent-gate` operationalizes the gating discipline from [**bow**](https://github.com/Jott2121/bow) (an autonomous all-Claude chief-of-staff agent) and the [**Fleet Mode**](https://github.com/Jott2121/fleet-mode) doctrine. Siblings in the same line: [**rag-guard**](https://github.com/Jott2121/rag-guard) · [**agent-cost-attribution**](https://github.com/Jott2121/agent-cost-attribution). MIT licensed.
