@@ -84,6 +84,52 @@ print(led.verify_chain())         # True  (until someone edits the log)
 pip install -e ".[dev]" && python -m pytest -q
 ```
 
+## Demo
+
+Run it yourself: `PYTHONPATH=. python3 examples/demo.py`
+
+```
+------------------------------------------------------------
+1. Agent claims done — but two checks are missing
+------------------------------------------------------------
+{
+  "passed": false,
+  "blocking": [
+    "human_gated_if_irreversible",
+    "honest_receipt_logged"
+  ]
+}
+
+------------------------------------------------------------
+2. Agent satisfies all five checks
+------------------------------------------------------------
+{
+  "passed": true,
+  "blocking": []
+}
+
+------------------------------------------------------------
+3. Record a hash-chained receipt
+------------------------------------------------------------
+{
+  "seq": 1,
+  "decision": "ship v0.1",
+  "verdict": "shipped",
+  "hash": "015202a168512f15..."
+}
+{
+  "seq": 2,
+  "decision": "deploy",
+  "verdict": "approved",
+  "hash": "9533d304d4dd07e5..."
+}
+
+------------------------------------------------------------
+4. Verify the chain — edit receipts.jsonl to see this flip to False
+------------------------------------------------------------
+chain_intact: True
+```
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
