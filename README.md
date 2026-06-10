@@ -16,6 +16,8 @@ Agents that grade their own homework ship low-quality output. `agent-gate` turns
 agent: "done!"  ->  verify_gate(evidence)  ->  { passed: false, blocking: ["independent_refute_review", "no_secrets"] }
 ```
 
+![agent-gate demo](assets/demo.gif)
+
 ## Why
 
 The expensive failures in agent systems are the silent ones: a model update degrades output, a change quietly breaks a workflow, an agent declares success while the work is wrong. The fix is not a smarter model. It is a gate the agent cannot talk its way past:

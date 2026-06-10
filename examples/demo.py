@@ -8,6 +8,7 @@ agent-gate demo — run this to see fail-closed gating and hash-chained receipts
 import json
 import tempfile
 import os
+import time
 from agent_gate.gate import DEFAULT_SHIP_GATE
 from agent_gate.ledger import Ledger
 
@@ -26,6 +27,7 @@ result = DEFAULT_SHIP_GATE.evaluate({
     # honest_receipt_logged: not provided         ->  fail-closed
 })
 print(json.dumps({"passed": result.passed, "blocking": result.blocking}, indent=2))
+time.sleep(2)
 
 # --- 2. Agent satisfies all checks ---
 print()
@@ -41,6 +43,7 @@ result2 = DEFAULT_SHIP_GATE.evaluate({
     "honest_receipt_logged": True,
 })
 print(json.dumps({"passed": result2.passed, "blocking": result2.blocking}, indent=2))
+time.sleep(2)
 
 # --- 3. Record a tamper-evident receipt ---
 print()
@@ -61,6 +64,7 @@ for r in [r1, r2]:
         "verdict": r["verdict"],
         "hash": r["hash"][:16] + "...",
     }, indent=2))
+    time.sleep(1)
 
 # --- 4. Verify the chain is intact ---
 print()
