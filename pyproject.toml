@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "agent-gate"
+name = "mcp-agent-gate"
 version = "0.1.0"
 description = "An MCP server that lets an AI agent gate its own work: deterministic checks, refute-first review, and tamper-evident honest receipts. Fleet Mode, as a tool."
 readme = "README.md"

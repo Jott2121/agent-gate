@@ -1,3 +1,4 @@
+<!-- mcp-name: io.github.jott2121/agent-gate -->
 ![agent-gate: gate an AI agent's work before it ships with deterministic checks, refute-first review, tamper-evident receipts](assets/banner.png)
 
 # agent-gate
@@ -37,8 +38,7 @@ The default **`ship` gate** encodes Fleet Mode: `deterministic_checks_pass`, `in
 ## Install & wire into an MCP client
 
 ```bash
-git clone https://github.com/Jott2121/agent-gate && cd agent-gate
-pip install -e .          # PyPI release coming
+pip install mcp-agent-gate   # or: pip install -e . (from source)
 ```
 
 Add it to your MCP client (Claude Desktop / Claude Code) config:
