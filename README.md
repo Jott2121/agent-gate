@@ -1,4 +1,4 @@
-<!-- mcp-name: io.github.jott2121/agent-gate -->
+<!-- mcp-name: io.github.Jott2121/agent-gate -->
 ![agent-gate: gate an AI agent's work before it ships with deterministic checks, refute-first review, tamper-evident receipts](assets/banner.png)
 
 # agent-gate
