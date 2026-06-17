@@ -140,7 +140,7 @@ chain_intact: True
 
 `agent-gate` is about not shipping unverified work, so the repository holds itself to the same bar:
 
-- **Coverage-gated test matrix** — `ci.yml` runs pytest on Python 3.11–3.13 and fails the build if line coverage drops below the threshold (currently 96% covered).
+- **Coverage-gated test matrix** — `ci.yml` runs pytest on Python 3.11–3.13 and fails the build if line coverage drops below the threshold (currently 97% covered).
 - **CodeQL** — static analysis (`security-extended`) runs on every push, PR, and weekly; findings surface in the Security tab.
 - **Pinned supply chain** — every GitHub Action is pinned to a full commit SHA; **Dependabot** keeps those pins and the Python deps current.
 - **Branch protection** — `main` requires the CI and CodeQL checks to pass before a merge.
