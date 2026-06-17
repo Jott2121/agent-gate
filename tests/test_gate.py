@@ -53,6 +53,15 @@ class GateTests(unittest.TestCase):
         self.assertFalse(g.evaluate({"a": "yes"}).passed)            # only literal True passes
         self.assertFalse(g.evaluate({"a": 1}).passed)
 
+    def test_get_gate_returns_registered_gate(self):
+        self.assertIs(G.get_gate(), G.DEFAULT_SHIP_GATE)             # defaults to "ship"
+        self.assertIs(G.get_gate("ship"), G.DEFAULT_SHIP_GATE)
+
+    def test_get_gate_unknown_name_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            G.get_gate("does_not_exist")
+        self.assertIn("does_not_exist", str(ctx.exception))          # names the bad gate
+
 
 if __name__ == "__main__":
     unittest.main()
