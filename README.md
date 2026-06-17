@@ -4,6 +4,8 @@
 # agent-gate
 
 [![ci](https://github.com/Jott2121/agent-gate/actions/workflows/ci.yml/badge.svg)](https://github.com/Jott2121/agent-gate/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Jott2121/agent-gate/actions/workflows/codeql.yml/badge.svg)](https://github.com/Jott2121/agent-gate/actions/workflows/codeql.yml)
+[![Coverage](https://raw.githubusercontent.com/Jott2121/agent-gate/python-coverage-comment-action-data/badge.svg)](https://github.com/Jott2121/agent-gate/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![MCP](https://img.shields.io/badge/MCP-server-blueviolet.svg)](https://modelcontextprotocol.io/)
@@ -133,6 +135,16 @@ Run it yourself: `PYTHONPATH=. python3 examples/demo.py`
 ------------------------------------------------------------
 chain_intact: True
 ```
+
+## This repo gates itself
+
+`agent-gate` is about not shipping unverified work, so the repository holds itself to the same bar:
+
+- **Coverage-gated test matrix** — `ci.yml` runs pytest on Python 3.11–3.13 and fails the build if line coverage drops below the threshold (currently 96% covered).
+- **CodeQL** — static analysis (`security-extended`) runs on every push, PR, and weekly; findings surface in the Security tab.
+- **Pinned supply chain** — every GitHub Action is pinned to a full commit SHA; **Dependabot** keeps those pins and the Python deps current.
+- **Branch protection** — `main` requires the CI and CodeQL checks to pass before a merge.
+- **Disclosure policy** — see [SECURITY.md](SECURITY.md).
 
 ## Contributing
 
