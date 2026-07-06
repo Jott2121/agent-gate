@@ -12,7 +12,7 @@
 
 **An MCP server that lets an AI agent gate its own work before it claims "done": deterministic checks, then an independent refute-first review, then a tamper-evident honest receipt.**
 
-Agents that grade their own homework ship low-quality output. `agent-gate` turns that discipline into tools an agent must actually pass: a **fail-closed** checklist and an **append-only, hash-chained** receipts ledger. It is [Fleet Mode](https://github.com/Jott2121/fleet-mode), my agent-orchestration doctrine, made into a runnable tool. Receipts over hype, enforced by the data structures.
+Agents that grade their own homework ship low-quality output. `agent-gate` turns that discipline into tools an agent must actually pass: a **fail-closed** checklist and an **append-only, hash-chained** receipts ledger. It is [Fleet Mode](https://github.com/Jott2121/fleet-mode), an agent-orchestration doctrine, made into a runnable tool. Receipts over hype, enforced by the data structures.
 
 > 🧩 One layer of a five-repo [**cost-governance stack**](https://github.com/Jott2121/bow#the-system-a-cost-governance-stack) for operating AI agents cost-efficiently; [bow](https://github.com/Jott2121/bow) is the flagship that runs every layer in production.
 
