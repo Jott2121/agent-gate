@@ -153,3 +153,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## About
 
 Built by **Jeff Otterson** ([Jott2121](https://github.com/Jott2121)). `agent-gate` operationalizes the gating discipline from [**bow**](https://github.com/Jott2121/bow) (an autonomous all-Claude chief-of-staff agent) and the [**Fleet Mode**](https://github.com/Jott2121/fleet-mode) doctrine. Siblings in the same line: [**rag-guard**](https://github.com/Jott2121/rag-guard) and [**agent-cost-attribution**](https://github.com/Jott2121/agent-cost-attribution). MIT licensed.
+
+## Companion instrument
+
+[sabot](https://github.com/Jott2121/sabot) is the measurement side of this idea. agent-gate
+adds a fail-closed gate to an agent workflow; sabot plants controlled faults inside running
+LangGraph, CrewAI and AutoGen pipelines and measures whether gates and reviewer stages like
+these actually fire. Median own-check detection across three production frameworks: 16.7%,
+with a pre-registered spec, an Apache-2.0 harness, and every raw trace published.
