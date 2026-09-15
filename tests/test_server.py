@@ -12,10 +12,14 @@ import unittest
 
 def _server_or_skip():
     try:
-        from agent_gate import server
-        return server
-    except ImportError as e:  # mcp SDK not present
+        import mcp  # noqa: F401
+    except ImportError as e:  # SDK genuinely absent (local dev on an unsupported Python)
         raise unittest.SkipTest(f"mcp SDK not installed: {e}")
+    # SDK present: any import failure below is a real incompatibility with the
+    # installed SDK, not a reason to skip. Skipping here silently drops
+    # server.py out of the coverage numbers and hides a broken entry point.
+    from agent_gate import server
+    return server
 
 
 class ServerToolTests(unittest.TestCase):

@@ -11,12 +11,15 @@ from __future__ import annotations
 
 import os
 
-from mcp.server.fastmcp import FastMCP
+try:  # mcp >= 2.0 renamed FastMCP -> MCPServer and moved the module
+    from mcp.server.mcpserver import MCPServer as _Server
+except ImportError:  # mcp 1.x
+    from mcp.server.fastmcp import FastMCP as _Server
 
 from agent_gate import gate as G
 from agent_gate.ledger import Ledger
 
-mcp = FastMCP("agent-gate")
+mcp = _Server("agent-gate")
 
 
 def _ledger_path() -> str:
