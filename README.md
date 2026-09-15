@@ -7,8 +7,8 @@
 | agent\_gate/\_\_init\_\_.py |        0 |        0 |    100% |           |
 | agent\_gate/gate.py         |       21 |        0 |    100% |           |
 | agent\_gate/ledger.py       |       41 |        1 |     98% |        66 |
-| agent\_gate/server.py       |       28 |        2 |     93% |    58, 62 |
-| **TOTAL**                   |   **90** |    **3** | **97%** |           |
+| agent\_gate/server.py       |       31 |        4 |     87% |16-17, 61, 65 |
+| **TOTAL**                   |   **93** |    **5** | **95%** |           |
 
 
 ## Setup coverage badge
