@@ -60,7 +60,7 @@ agent_gate/     gate.py (fail-closed checklist), ledger.py (hash chain), server.
 tests/          unittest for the gate, the ledger, and the MCP tools (called, not just imported)
 examples/       demo.py — manual walkthrough, not part of CI
 scripts/        check_receipts.py — recomputes README gate examples; checks the 90% floor
-                scan_blocked_terms.py — employer-term scanner (hash list + optional BLOCKED_TERMS secret)
+                scan_blocked_terms.py — employer-term scanner (hash list + optional EMPLOYER_MARKERS regex secret)
 assets/         banner and demo gif
 .github/        ci.yml (test matrix + coverage comment + receipts + employer scan), codeql.yml, publish.yml, dependabot.yml,
                 blocked-terms.sha256 (hashed blocked terms; the scan fails if it is missing or empty)
@@ -76,5 +76,5 @@ No `eval/`, no `docs/`, no Grok or xAI client. `.cursor/rules/60-grok-integratio
 - **`16.7%` is sabot's number**, cited in the companion paragraph. This repo cannot recompute it.
 - **Demo hashes are not receipts.** `Ledger.append` hashes the timestamp. `examples/demo.py` uses the wall clock and sleeps. The truncated hashes in the README will not match a fresh run.
 - **Server tests and coverage.** Skipping `tests/test_server.py` while `mcp` is installed drops `server.py` out of the coverage number and hides a broken entry point. The 1.x import fallback (`except ImportError`) is only covered when that older SDK is what imports.
-- **Blocked terms are stored as hashes only.** Never write a blocked term in plain text, even in policy files, tests, or commit messages; the scan covers every tracked file. Add a term by appending its digest to `.github/blocked-terms.sha256` (the file header shows the command) or through the `BLOCKED_TERMS` repo secret. Tests plant synthetic terms in temp dirs.
+- **Blocked terms are stored as hashes only.** Never write a blocked term in plain text, even in policy files, tests, or commit messages; the scan covers every tracked file. Add a term by appending its digest to `.github/blocked-terms.sha256` (the file header shows the command) or through the `EMPLOYER_MARKERS` Actions secret (a regex alternation, added on top of the hash list, never instead of it). Tests plant synthetic terms in temp dirs.
 - **Do not commit a ledger.** `receipts.jsonl` and `.agent-gate/` are gitignored. Tests point `AGENT_GATE_LEDGER` at a temp file.

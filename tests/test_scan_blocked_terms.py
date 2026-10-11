@@ -23,10 +23,10 @@ def _digest(term):
     return hashlib.sha256(term.encode("utf-8")).hexdigest()
 
 
-def _run(cwd, *args, env_terms=None):
-    env = {k: v for k, v in os.environ.items() if k != "BLOCKED_TERMS"}
-    if env_terms is not None:
-        env["BLOCKED_TERMS"] = env_terms
+def _run(cwd, *args, markers=None):
+    env = {k: v for k, v in os.environ.items() if k != "EMPLOYER_MARKERS"}
+    if markers is not None:
+        env["EMPLOYER_MARKERS"] = markers
     return subprocess.run(
         [sys.executable, str(SCRIPT), *args],
         cwd=cwd,
@@ -46,6 +46,7 @@ class ScanTempRepoTests(unittest.TestCase):
             f"# synthetic\n{_digest(PLANTED_WORD)}\n{_digest(PLANTED_PHRASE)}\n"
         )
         self._write("README.md", "A clean tree about agent gates.\n")
+        self._write(".cursor/rules/x.mdc", "policy text\n")
         self._write("results/run1.json", '{"note": "amber and lattice apart"}\n')
 
     def tearDown(self):
@@ -57,8 +58,8 @@ class ScanTempRepoTests(unittest.TestCase):
         path.write_text(text)
         subprocess.run(["git", "add", "-f", rel], cwd=self.repo, check=True)
 
-    def _scan(self, *args, env_terms=None):
-        return _run(self.repo, "--hashes", str(self.hashes), *args, env_terms=env_terms)
+    def _scan(self, *args, markers=None):
+        return _run(self.repo, "--hashes", str(self.hashes), *args, markers=markers)
 
     def test_clean_tree_passes(self):
         proc = self._scan()
@@ -82,21 +83,41 @@ class ScanTempRepoTests(unittest.TestCase):
         self._write("notes.txt", "zephyrquills and prezephyrquill are different words\n")
         self.assertEqual(self._scan().returncode, 0)
 
-    def test_data_folders_are_scanned_and_generated_dirs_are_not(self):
-        self._write("fixtures/data.txt", f"{PLANTED_WORD}\n")
-        self.assertEqual(self._scan().returncode, 1)
-        (self.repo / "fixtures/data.txt").unlink()
-        subprocess.run(["git", "rm", "-q", "--cached", "fixtures/data.txt"], cwd=self.repo, check=True)
+    def test_data_and_policy_folders_are_scanned_and_generated_dirs_are_not(self):
+        for rel in ("fixtures/data.txt", "AGENTS.md", ".cursor/BUGBOT.md", ".github/workflows/ci.yml"):
+            with self.subTest(path=rel):
+                self._write(rel, f"{PLANTED_WORD}\n")
+                proc = self._scan()
+                self.assertEqual(proc.returncode, 1)
+                self.assertIn(f"{rel}:1: blocked term", proc.stdout)
+                subprocess.run(["git", "rm", "-q", "-f", rel], cwd=self.repo, check=True)
         self._write("node_modules/pkg/index.js", f"// {PLANTED_WORD}\n")
         self._write("build/out.txt", f"{PLANTED_WORD}\n")
         self.assertEqual(self._scan().returncode, 0)
 
-    def test_env_term_is_caught_even_when_not_in_hash_file(self):
-        self._write("a.txt", "the cobalt heron project\n")
+    def test_employer_markers_regex_is_caught_even_when_not_in_hash_file(self):
+        self._write("a.txt", "the Cobalt Heron project\n")
         self.assertEqual(self._scan().returncode, 0)
-        proc = self._scan(env_terms=" , Cobalt Heron Project ,")
+        proc = self._scan(markers=r"cobalt\s+heron|\bcbh\b")
         self.assertEqual(proc.returncode, 1)
-        self.assertIn("a.txt:1: blocked term", proc.stdout)
+        self.assertIn("a.txt:1: blocked term (EMPLOYER_MARKERS)", proc.stdout)
+        self.assertNotIn("heron", (proc.stdout + proc.stderr).lower())
+
+    def test_hash_list_still_catches_planted_term_when_markers_unset_or_blank(self):
+        self._write("a.txt", f"{PLANTED_WORD}\n")
+        self.assertEqual(self._scan().returncode, 1)
+        self.assertEqual(self._scan(markers="  ").returncode, 1)
+        self.assertEqual(self._scan(markers="cobalt heron").returncode, 1)
+
+    def test_invalid_employer_markers_fail_closed(self):
+        for bad in ("cobalt(heron", "cobalt|"):
+            with self.subTest(markers=bad):
+                self.assertEqual(self._scan(markers=bad).returncode, 2)
+
+    def test_hash_file_itself_is_not_scanned(self):
+        # A markers regex that matches hex digests would otherwise flag it.
+        self._write("terms.sha256", self.hashes.read_text())
+        self.assertEqual(self._scan(markers=r"[0-9a-f]{64}").returncode, 0)
 
     def test_explicit_path_mode_scans_only_given_files(self):
         self._write("bad.txt", f"{PLANTED_WORD}\n")
@@ -115,9 +136,9 @@ class ScanTempRepoTests(unittest.TestCase):
         self.assertEqual(proc.returncode, 2)
         self.assertIn("cannot read hash file", proc.stderr)
 
-    def test_empty_hash_file_fails_closed_even_with_env_terms(self):
+    def test_empty_hash_file_fails_closed_even_with_markers_set(self):
         self.hashes.write_text("# comments only\n\n")
-        proc = self._scan(env_terms="cobalt heron")
+        proc = self._scan(markers="cobalt heron")
         self.assertEqual(proc.returncode, 2)
         self.assertIn("no digests", proc.stderr)
 

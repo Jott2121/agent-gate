@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
-"""Fail if any tracked file contains a blocked term.
+"""Fail if any tracked file contains a blocked employer term.
 
 The blocked terms are never stored in the repo. ``.github/blocked-terms.sha256``
 holds one SHA-256 hex digest per term, computed over the lowercased term with
 its words joined by single spaces. The scanner splits each line of text into
-lowercase alphanumeric words, hashes every word and every run of adjacent words
-up to the longest configured phrase (at least 2), and reports a hit when a
-digest matches.
+lowercase alphanumeric words, hashes every word and every pair of adjacent
+words, and reports a hit when a digest matches. This base list is required:
+the scan catches the listed terms with no secret configured.
 
-Extra terms can be supplied in plain text through the ``BLOCKED_TERMS``
-environment variable (comma-separated, e.g. from a CI secret).
+Extra markers can be supplied through the ``EMPLOYER_MARKERS`` environment
+variable (e.g. from an Actions secret of the same name): a regex alternation
+matched case-insensitively against each line, in addition to the hash list.
 
 Exit codes: 0 clean, 1 blocked term found, 2 configuration or read error.
-A missing, empty, or malformed hash file is a configuration error, so the
-check fails closed. Hits are reported as ``path:line`` plus a digest prefix;
-the matched text is never printed.
+A missing, empty, or malformed hash file, or an invalid ``EMPLOYER_MARKERS``
+regex, is a configuration error, so the check fails closed. Hits are reported
+as ``path:line`` plus a digest prefix or marker label; the matched text is
+never printed.
 """
 
 from __future__ import annotations
@@ -29,8 +31,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_HASH_FILE = ROOT / ".github" / "blocked-terms.sha256"
-MIN_PHRASE_WORDS = 2
-# Generated or vendored output only. Data folders (results/, fixtures, docs) are scanned.
+PHRASE_WORDS = 2
+# Generated or vendored output only. Data folders (results/, fixtures, docs) and
+# policy files (AGENTS.md, .cursor/, .github/) are scanned.
 EXCLUDED_DIRS = frozenset(
     {
         ".git",
@@ -79,14 +82,17 @@ def load_hashes(path: Path) -> set[str]:
     return hashes
 
 
-def env_terms(value: str | None) -> dict[str, int]:
-    """Map digest -> word count for each comma-separated term in ``value``."""
-    terms = {}
-    for raw in (value or "").split(","):
-        term = normalize(raw)
-        if term:
-            terms[digest(term)] = len(term.split(" "))
-    return terms
+def load_markers(value: str | None) -> re.Pattern[str] | None:
+    """Compile ``EMPLOYER_MARKERS``; unset or blank means hash list only."""
+    if not value or not value.strip():
+        return None
+    try:
+        pattern = re.compile(value.strip(), re.IGNORECASE)
+    except re.error as exc:
+        raise ConfigError(f"EMPLOYER_MARKERS is not a valid regex: {exc}") from exc
+    if pattern.search(""):
+        raise ConfigError("EMPLOYER_MARKERS matches the empty string (stray '|'?)")
+    return pattern
 
 
 def is_excluded(path: str) -> bool:
@@ -103,30 +109,36 @@ def tracked_files(cwd: Path) -> list[str]:
     return [p for p in proc.stdout.split("\0") if p and not is_excluded(p)]
 
 
-def scan_text(text: str, hashes: set[str], max_words: int) -> list[tuple[int, str]]:
+def scan_text(
+    text: str, hashes: set[str], markers: re.Pattern[str] | None
+) -> list[tuple[int, str]]:
     hits = []
     for number, line in enumerate(text.splitlines(), start=1):
         words = WORD.findall(line.lower())
         for start in range(len(words)):
-            for size in range(1, max_words + 1):
+            for size in range(1, PHRASE_WORDS + 1):
                 if start + size > len(words):
                     break
                 h = hashlib.sha256(
                     " ".join(words[start : start + size]).encode("utf-8")
                 ).hexdigest()
                 if h in hashes:
-                    hits.append((number, h))
+                    hits.append((number, f"sha256 {h[:12]}"))
+        if markers is not None and markers.search(line):
+            hits.append((number, "EMPLOYER_MARKERS"))
     return hits
 
 
-def scan_file(path: Path, hashes: set[str], max_words: int) -> list[tuple[int, str]]:
+def scan_file(
+    path: Path, hashes: set[str], markers: re.Pattern[str] | None
+) -> list[tuple[int, str]]:
     try:
         data = path.read_bytes()
     except OSError as exc:
         raise ConfigError(f"cannot read {path}: {exc}") from exc
     if b"\0" in data[:8192]:
         return []
-    return scan_text(data.decode("utf-8", errors="replace"), hashes, max_words)
+    return scan_text(data.decode("utf-8", errors="replace"), hashes, markers)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -141,15 +153,18 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         hashes = load_hashes(args.hashes)
-        extra = env_terms(os.environ.get("BLOCKED_TERMS"))
-        hashes |= set(extra)
-        max_words = max([MIN_PHRASE_WORDS, *extra.values()])
+        markers = load_markers(os.environ.get("EMPLOYER_MARKERS"))
         cwd = Path.cwd()
-        paths = args.paths or tracked_files(cwd)
+        hash_file = args.hashes.resolve()
+        paths = [
+            p
+            for p in (args.paths or tracked_files(cwd))
+            if (cwd / p).resolve() != hash_file
+        ]
         hits = []
         for p in paths:
-            for number, h in scan_file(cwd / p, hashes, max_words):
-                hits.append(f"{p}:{number}: blocked term (sha256 {h[:12]})")
+            for number, label in scan_file(cwd / p, hashes, markers):
+                hits.append(f"{p}:{number}: blocked term ({label})")
     except ConfigError as exc:
         print(f"scan_blocked_terms: {exc}", file=sys.stderr)
         return 2
@@ -158,7 +173,8 @@ def main(argv: list[str] | None = None) -> int:
         print("\n".join(hits))
         print(f"scan_blocked_terms: {len(hits)} blocked term hit(s)", file=sys.stderr)
         return 1
-    print(f"scan_blocked_terms: clean ({len(paths)} files, {len(hashes)} terms)")
+    extra = " + EMPLOYER_MARKERS" if markers else ""
+    print(f"scan_blocked_terms: clean ({len(paths)} files, {len(hashes)} hashed terms{extra})")
     return 0
 
 

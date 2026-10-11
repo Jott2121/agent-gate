@@ -64,14 +64,15 @@ jobs:
 
   no-employer-data:
     # Scans every tracked file against the hashed terms in
-    # .github/blocked-terms.sha256 (plus the optional BLOCKED_TERMS secret).
-    # Exits non-zero if the hash file is missing or empty.
+    # .github/blocked-terms.sha256, plus the optional EMPLOYER_MARKERS secret
+    # (regex alternation). The hash list alone catches the employer name when
+    # the secret is unset; the job fails if the hash file is missing or empty.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - name: Block employer / export-control terms
         env:
-          BLOCKED_TERMS: ${{ secrets.BLOCKED_TERMS }}
+          EMPLOYER_MARKERS: ${{ secrets.EMPLOYER_MARKERS }}
         run: python3 scripts/scan_blocked_terms.py
       - name: Block committed build junk
         run: "! git ls-files | grep -E '(__pycache__/|\\.pyc$|^\\.coverage$)'"
