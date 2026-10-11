@@ -12,3 +12,6 @@ receipts.jsonl
 .coverage
 coverage.xml
 htmlcov/
+
+# Cursor hook logs (local; not source)
+.cursor/hook-logs/

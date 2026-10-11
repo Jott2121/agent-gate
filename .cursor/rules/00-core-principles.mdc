@@ -1,0 +1,13 @@
+---
+description: Core working principles for Jeff Otterson's portfolio repos — receipts, honest benchmarks, fail-closed, no employer data
+alwaysApply: true
+---
+# Core principles (always on)
+
+- Personal work only. Never introduce Lockheed Martin data, names, acronyms, documents, or realistic HR records. Synthetic data from a seeded, committed generator only. If unsure where content came from, stop and ask.
+- Every claim needs a receipt: a committed command that reproduces it and the artifact it produces. No adjectives without numbers.
+- Report nulls/regressions as prominently as wins. State n, seeds, model+version, date, cost.
+- Decision paths fail closed (deny on error/timeout/missing input). Never weaken a guard, threshold, or coverage floor to get green.
+- Done = lint + tests pass and the output is pasted in the PR. New behavior ships with a test that fails without it.
+- No irreversible actions: no force-push, history rewrite, release tagging, package publishing, or posting. Open a PR.
+- See AGENTS.md for commands. Run them; don't guess.

@@ -1,0 +1,15 @@
+---
+description: Python conventions for agent-gate
+globs: "**/*.py"
+alwaysApply: false
+---
+# Python
+
+- Target Python 3.11+ (`requires-python` in pyproject.toml). CI runs 3.11, 3.12, and 3.13.
+- `agent_gate/gate.py` and `agent_gate/ledger.py` stay stdlib-only. The only runtime dependency is `mcp`, and it stays in `agent_gate/server.py`.
+- A new runtime dependency needs a one-line justification in the PR and a pinned lower bound in pyproject.
+- Type hints on all public functions; `from __future__ import annotations` where useful.
+- No bare `except:`; no `except Exception: pass` in any decision path. Raise specific exceptions.
+- Deterministic by default: seed every RNG, sort dict/set iteration before hashing or printing, freeze timestamps in tests. Ledger hashes include the timestamp, so tests pass a frozen clock.
+- Secrets via `os.environ` only; never log secret values.
+- Use `pathlib`; no hard-coded absolute paths (no `/Users/...`).

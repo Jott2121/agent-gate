@@ -1,0 +1,13 @@
+---
+description: Testing rules — applies when editing tests or code under test
+globs: "tests/**,**/test_*.py,**/*_test.py,pyproject.toml,pytest.ini,setup.cfg"
+alwaysApply: false
+---
+# Tests
+
+- Write the failing test first, show it failing, then make it pass. Paste both runs in the PR.
+- Test behavior, not implementation. Exercise real entry points (e.g. call the MCP tool, not just import it).
+- Every guard/gate gets a deny-path test: error, timeout, malformed input, empty input.
+- Never add `skip`, `xfail`, or loosen assertions to get green. Never lower `--cov-fail-under` or mutation thresholds.
+- Tests must run offline with no API keys; live-model tests are marked and deselected by default.
+- No network, no wall-clock sleeps, no order dependence. Use fixtures with fixed seeds.

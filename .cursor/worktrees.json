@@ -1,0 +1,5 @@
+{
+  "setup-worktree-unix": [
+    "python -m pip install -q -e '.[dev]' pytest-cov"
+  ]
+}

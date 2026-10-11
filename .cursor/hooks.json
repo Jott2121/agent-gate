@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/guard-shell.sh",
+        "matcher": "git push|git reset|git rebase|git tag|twine|uv publish|gh release|curl|wget|rm -rf",
+        "failClosed": true,
+        "timeout": 10
+      }
+    ],
+    "afterFileEdit": [
+      { "command": ".cursor/hooks/format-and-scan.sh", "timeout": 30 }
+    ],
+    "stop": [
+      { "command": ".cursor/hooks/audit-log.sh", "timeout": 10 }
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "mcpServers": {
+    "context7": { "url": "https://mcp.context7.com/mcp", "headers": { "Context7-API-Key": "${env:CONTEXT7_API_KEY}" } },
+    "agent-gate": { "command": "uvx", "args": ["--from", "mcp-agent-gate", "agent-gate"] }
+  }
+}

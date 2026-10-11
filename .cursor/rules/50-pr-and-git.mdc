@@ -1,0 +1,13 @@
+---
+description: Use when committing, opening or updating a pull request, writing a PR description, or preparing a release
+alwaysApply: false
+---
+# PRs and git
+
+- Branch per task: `agent/<short-task>`. Small PRs, one intent, < ~400 changed lines when possible.
+- Conventional titles: `feat|fix|test|docs|refactor|chore|perf(scope): summary`.
+- PR body sections (required): What · Why · How verified (exact commands + trimmed output) · Numbers changed (before → after + command) · Risks · Not done / follow-ups · Plan link (`.cursor/plans/...`) · Agent run link if any.
+- Attach artifacts for anything visual or behavioral (screenshot, short video, eval table).
+- Never force-push shared branches, rewrite history, tag, or publish. A human merges.
+- `.cursor/hooks/guard-shell.sh` denies any command containing `rebase`, so `git pull --rebase` is blocked along with other history rewrites.
+- Address every Bugbot / Security Review finding: fix it or reply with a reason. Don't silently resolve.
