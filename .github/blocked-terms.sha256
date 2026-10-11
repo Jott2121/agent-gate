@@ -1,0 +1,12 @@
+# SHA-256 of each blocked term: lowercased, words joined by one space.
+# Do not add plain-text terms here. Generate a line with:
+#   python3 -c "import sys; sys.path.insert(0, 'scripts'); from scan_blocked_terms import digest; print(digest('TERM'))"
+# Read by scripts/scan_blocked_terms.py (CI no-employer-data job and .cursor/hooks/format-and-scan.sh).
+18cc670c0768f912a5af690322ed5f16c59def0be45c180549f9bbc44277dd2a
+75650d98e971a3fc702475924eb86f3cd8fdb4968487e8381634940ae47d1466
+8c6a10a10f5de2282f957c71717b5a15ab371af5bd781b4d38e72f556964da06
+9049697da52b7e0efb06ef942d752352a8336c4cc657b095b882a63495d75d51
+c376013522845bfce25461e2335a75a6808fd9365beba1c8ad75200ff2488ea3
+cb5c36fe59056a6a1afb4b133d30981f672257d6c372bace38798b504fc0c6f2
+d7733fd2403eec1b35bca7c1609fb2b2e113db64daba4be93ace5598b2a7de64
+f277af9c64194778d745db1e6f142c724110717970ed251b4611f28e683957ae
