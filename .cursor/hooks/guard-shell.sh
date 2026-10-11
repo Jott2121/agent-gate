@@ -22,8 +22,9 @@ if [ -z "${cmd//[[:space:]]/}" ]; then
   deny "Shell guard blocked a missing command."
 fi
 case "$cmd" in
-  *"push --force"*|*"push -f"*|*"--force-with-lease"*|*"git push"*"--force"*|*"git push"*" -f"*) deny "Force-push blocked by repo policy." ;;
-  *"reset --hard"*|*"rebase"*)                        deny "History rewrite blocked by repo policy." ;;
+  # Flag may sit next to the subcommand or after the remote/ref.
+  *"git push"*"--force"*|*"git push"*" -f"*|*"push --force"*|*"push -f"*|*"--force-with-lease"*) deny "Force-push blocked by repo policy." ;;
+  *"git reset"*"--hard"*|*"rebase"*)                  deny "History rewrite blocked by repo policy." ;;
   *"git tag"*|*"twine upload"*|*"uv publish"*|*"gh release"*) deny "Releases/publishing are human-only." ;;
   *"rm -rf /"*|*"rm -rf ~"*|*'rm -rf $HOME'*)         deny "Destructive delete blocked." ;;
   *"curl"*"| sh"*|*"curl"*"| bash"*|*"wget"*"| sh"*|*"wget"*"| bash"*) deny "Pipe-to-shell blocked." ;;
