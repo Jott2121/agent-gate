@@ -9,5 +9,5 @@ alwaysApply: false
 - PR body sections (required): What · Why · How verified (exact commands + trimmed output) · Numbers changed (before → after + command) · Risks · Not done / follow-ups · Plan link (`.cursor/plans/...`) · Agent run link if any.
 - Attach artifacts for anything visual or behavioral (screenshot, short video, eval table).
 - Never force-push shared branches, rewrite history, tag, or publish. A human merges.
-- The hook matcher includes `rebase`, so `git pull --rebase` reaches `.cursor/hooks/guard-shell.sh`, which denies it along with other history rewrites. Force-push is denied even when `--force` or `-f` comes after the ref. `wget` piped to `bash` is denied the same way as `curl` piped to `bash`.
+- The hook matcher includes `git pull` and `rebase`, so `git pull --rebase` reaches `.cursor/hooks/guard-shell.sh` and is denied. A plain `git pull` is allowed. Force-push is denied even when `--force` or `-f` comes after the ref. `wget` piped to `bash` is denied the same way as `curl` piped to `bash`. A missing, blank, or non-string `command` is denied; invalid JSON exits non-zero.
 - Address every Bugbot / Security Review finding: fix it or reply with a reason. Don't silently resolve.
