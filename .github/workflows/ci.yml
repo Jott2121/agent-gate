@@ -63,50 +63,15 @@ jobs:
         run: python scripts/check_receipts.py
 
   no-employer-data:
+    # Scans every tracked file against the hashed terms in
+    # .github/blocked-terms.sha256 (plus the optional BLOCKED_TERMS secret).
+    # Exits non-zero if the hash file is missing or empty.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - name: Block employer / export-control markers and committed build junk
-        run: |
-          python3 - <<'PY'
-          import subprocess
-          import sys
-          from pathlib import Path
-
-          pattern = r"lockheed|\blmco\b|\bCUI\b|ITAR|EXPORT CONTROLLED|PROPRIETARY"
-          proc = subprocess.run(
-              [
-                  "git", "grep", "-nIiE", pattern, "--",
-                  ".", ":!.cursor", ":!AGENTS.md", ":!.github",
-              ],
-              capture_output=True,
-              text=True,
-          )
-          if proc.returncode not in (0, 1):
-              sys.stderr.write(proc.stderr)
-              sys.exit(proc.returncode or 1)
-
-          readme = Path("README.md").read_text(encoding="utf-8").splitlines()
-          about = set()
-          in_about = False
-          for number, line in enumerate(readme, start=1):
-              if not in_about and line.startswith("## About"):
-                  in_about = True
-              elif in_about and line.startswith("## "):
-                  in_about = False
-              if in_about:
-                  about.add(number)
-
-          bad = []
-          for hit in proc.stdout.splitlines():
-              if not hit.strip():
-                  continue
-              path, lineno, _rest = hit.split(":", 2)
-              if path == "README.md" and int(lineno) in about:
-                  continue
-              bad.append(hit)
-          if bad:
-              print("\n".join(bad))
-              sys.exit(1)
-          PY
-          ! git ls-files | grep -E '(__pycache__/|\.pyc$|^\.coverage$)'
+      - name: Block employer / export-control terms
+        env:
+          BLOCKED_TERMS: ${{ secrets.BLOCKED_TERMS }}
+        run: python3 scripts/scan_blocked_terms.py
+      - name: Block committed build junk
+        run: "! git ls-files | grep -E '(__pycache__/|\\.pyc$|^\\.coverage$)'"

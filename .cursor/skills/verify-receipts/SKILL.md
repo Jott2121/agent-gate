@@ -14,7 +14,7 @@ description: Use before opening or updating a PR, or when README/docs numbers ch
    Known gap: README says "currently 97% covered". `scripts/check_receipts.py` prints the percentage from the pytest command above. If they differ, report both. Leave the sentence alone unless the PR's purpose is to update that published number.
    The `16.7%` sentence cites sabot. Do not recompute it in this repo.
    Demo hash prefixes in the README are not stable receipts. Ledger hashes include a timestamp.
-3. Grep the diff for employer-data and secret patterns (see `.cursor/rules/40-security-and-data.mdc`). The README `## About` author bio is the only allowed hit. Any other hit means stop and report.
+3. Run `python3 scripts/scan_blocked_terms.py` (employer terms, whole tree, no exempt files) and grep the diff for secret patterns (see `.cursor/rules/40-security-and-data.mdc`). Any hit, or a scanner exit code other than 0, means stop and report.
 4. Confirm `--cov-fail-under=90` is unchanged and no tests were skipped, xfailed, or removed.
 5. Output a Markdown block:
    - Commands run + pass/fail

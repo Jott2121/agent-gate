@@ -6,7 +6,7 @@ Flag as **blocking**:
 2. Lowered thresholds: `--cov-fail-under` (the floor is 90), mutation score floors, MIN_SCORE-style constants, retry/timeout bounds removed.
 3. Tests that were deleted, skipped, xfailed, or had assertions weakened without a stated reason in the PR body. `tests/test_server.py` may skip only when the `mcp` SDK is absent; a present SDK must not be skipped.
 4. README/docs numbers that changed without a reproducing command or artifact in the PR.
-5. Any content that looks like employer/corporate data: company names (Lockheed, LM, LMCO), internal acronyms, CUI/ITAR markings, real-looking employee records, internal URLs. This repo is personal work only. The existing README author bio is the only allowed mention.
+5. Any content that looks like employer/corporate data: an employer's name or its abbreviations, internal acronyms, program or site names, classification or export-control markings, real-looking employee records, internal URLs. This repo is personal work only; there are no allowed mentions. Also block any plain-text blocked term added to `.github/blocked-terms.sha256`, and any change that excludes paths from `scripts/scan_blocked_terms.py` or lets it pass when the hash file is missing or empty.
 6. Secrets, tokens, `.env` files, or absolute personal paths committed.
 7. Unpinned GitHub Actions (must be full SHA) or widened workflow `permissions:`.
 8. Live network / model calls added to the default test path.
