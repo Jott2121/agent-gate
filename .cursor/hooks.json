@@ -4,7 +4,7 @@
     "beforeShellExecution": [
       {
         "command": ".cursor/hooks/guard-shell.sh",
-        "matcher": "git push|git reset|git rebase|git tag|twine|uv publish|gh release|curl|wget|rm -rf",
+        "matcher": "git push|git reset|rebase|git tag|twine|uv publish|gh release|curl|wget|rm -rf",
         "failClosed": true,
         "timeout": 10
       }

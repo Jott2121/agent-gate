@@ -69,7 +69,7 @@ No `eval/`, no `docs/`, no Grok or xAI client. `.cursor/rules/60-grok-integratio
 
 ## Known traps
 
-- **The shell guard blocks `git pull --rebase`.** `.cursor/hooks/guard-shell.sh` denies every command whose text contains `rebase` (same branch as `git rebase` and `git reset --hard`). It also denies force-push, tags, and publishes, and it asks before `git push`, `curl`, and `wget`. Pull with merge, or leave updating the branch to a human. Do not weaken the hook.
+- **The shell guard blocks `git pull --rebase`.** The hook matcher includes `rebase`, not only the words `git rebase`, so `git pull --rebase` reaches `.cursor/hooks/guard-shell.sh`. That script denies any command containing `rebase`, plus `git reset --hard`. Force-push is denied when `--force`, `--force-with-lease`, or a standalone `-f` appears on a `git push`, including after the remote or ref. `curl` or `wget` piped to `sh` or `bash` is denied. A normal `git push`, `curl`, or `wget` asks first. Pull with merge, or leave updating the branch to a human. Do not weaken the hook.
 - **Coverage floor is 90, not the README percentage.** `ci.yml` uses `--cov-fail-under=90`. README says "currently 97% covered". `scripts/check_receipts.py` prints the measured figure and does not edit README. Do not "correct" that sentence in an unrelated PR, and do not lower the floor so a run stays green.
 - **`16.7%` is sabot's number**, cited in the companion paragraph. This repo cannot recompute it.
 - **Demo hashes are not receipts.** `Ledger.append` hashes the timestamp. `examples/demo.py` uses the wall clock and sleeps. The truncated hashes in the README will not match a fresh run.
