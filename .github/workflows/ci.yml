@@ -47,3 +47,66 @@ jobs:
         uses: py-cov-action/python-coverage-comment-action@cc6cde2639ed103404ce0da9e75114ae9561e691 # v3
         with:
           GITHUB_TOKEN: ${{ github.token }}
+
+  receipts:
+    # Recompute the fail-closed README examples and confirm the 90% floor
+    # was not lowered. Does not rewrite published numbers.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e ".[dev]" pytest-cov
+      - name: Recompute receipts
+        run: python scripts/check_receipts.py
+
+  no-employer-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Block employer / export-control markers and committed build junk
+        run: |
+          python3 - <<'PY'
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          pattern = r"lockheed|\blmco\b|\bCUI\b|ITAR|EXPORT CONTROLLED|PROPRIETARY"
+          proc = subprocess.run(
+              [
+                  "git", "grep", "-nIiE", pattern, "--",
+                  ".", ":!.cursor", ":!AGENTS.md", ":!.github",
+              ],
+              capture_output=True,
+              text=True,
+          )
+          if proc.returncode not in (0, 1):
+              sys.stderr.write(proc.stderr)
+              sys.exit(proc.returncode or 1)
+
+          readme = Path("README.md").read_text(encoding="utf-8").splitlines()
+          about = set()
+          in_about = False
+          for number, line in enumerate(readme, start=1):
+              if not in_about and line.startswith("## About"):
+                  in_about = True
+              elif in_about and line.startswith("## "):
+                  in_about = False
+              if in_about:
+                  about.add(number)
+
+          bad = []
+          for hit in proc.stdout.splitlines():
+              if not hit.strip():
+                  continue
+              path, lineno, _rest = hit.split(":", 2)
+              if path == "README.md" and int(lineno) in about:
+                  continue
+              bad.append(hit)
+          if bad:
+              print("\n".join(bad))
+              sys.exit(1)
+          PY
+          ! git ls-files | grep -E '(__pycache__/|\.pyc$|^\.coverage$)'
